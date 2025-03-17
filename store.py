@@ -2,9 +2,20 @@ import products
 
 class Store:
     def __init__(self, list_of_products = []):
+        """
+        Initialize the store
+        """
         self.list_of_products = list_of_products
 
     def add_product(self, new_product):
+        """
+        Add a new product to the store.
+        If the product is already listed in the store, product quantity is changed but
+        no duplicate product is added.
+        If the price is different and the name is the same, the new product is added.
+        :param new_product: instance of products.Product
+        :return: None
+        """
         for old_product in self.list_of_products:
             if old_product.name == new_product.name and old_product.price == new_product.price:
                 old_product.quantity += new_product.quantity
@@ -21,26 +32,39 @@ class Store:
     def get_all_products(self):
         return [product for product in self.list_of_products if product.is_active()]
 
-    def validate_shopping_list(self, shopping_list):
+    def get_product_type_quantity(self):
+        """
+        Return how many different items are active in the store inventory.
+        """
+        return sum(1 for product in self.list_of_products if product.is_active())
 
+    def validate_shopping_list(self, shopping_list):
         for item in shopping_list:
             if not isinstance(item, tuple):
-                return False
+                return False, "Shopping list format is wrong."
             if len(item) != 2:
-                return False
-            product, quantity = item
+                return False, "Shopping list format is wrong."
+        unified_shopping_list = {}
+        for product, quantity in shopping_list:
             if not isinstance(product, products.Product) or not isinstance(quantity, int):
-                return False
+                return False, "Shopping list format is wrong."
+            if product in unified_shopping_list:
+                unified_shopping_list[product] += quantity
+            else:
+                unified_shopping_list[product] = quantity
+        for product, quantity in unified_shopping_list.items():
             if product not in self.list_of_products:
-                return False
+                return False, f"Product {product.name} is not in the store."
             if quantity > product.get_quantity():
-                return False
-        return True
+                return False, (f"there are {product.get_quantity()} items of {product.name} available. "
+                               f"The store cannot provide the requested amount: {quantity}")
+        return True, "No errors"
 
     def order(self, shopping_list):
-        if self.validate_shopping_list(shopping_list) is False:
-            raise ValueError("Invalid shopping list.")
-        return sum(product.buy(quantity) for product, quantity in shopping_list)
+        validation_result, message = self.validate_shopping_list(shopping_list)
+        if validation_result is not True:
+            return None, message
+        return sum(product.buy(quantity) for product, quantity in shopping_list), "Order completed successfully."
 
 
 def main():

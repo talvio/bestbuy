@@ -1,3 +1,4 @@
+
 class Product:
 
     def __init__(self, name, price, quantity):
@@ -46,11 +47,17 @@ class Product:
         """
         self.active = False
 
-    def show(self):
+    def show(self, quantity=None):
         """
         Return the product name, price and quantity in a string.
         """
-        return f"{self.name}, {self.price}, {self.quantity}"
+        return f"{self.name}, Price: ${self.price}, Quantity: {self.quantity}"
+
+    def name_and_price(self, quantity=1):
+        """
+        Return the product name and price based on given quantity.
+        """
+        return self.name, self.price * quantity
 
     def buy(self, quantity):
         """
@@ -61,6 +68,8 @@ class Product:
         if quantity > self.quantity:
             raise ValueError("Quantity is greater than product quantity")
         self.quantity -= quantity
+        if self.quantity == 0:
+            self.deactivate()
         return quantity * self.price
 
 
