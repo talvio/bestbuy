@@ -1,6 +1,7 @@
+import os
+import sys
 import store
 import products
-import os
 
 STORE_MENU = """
    Store Menu
@@ -25,7 +26,12 @@ def clear_the_terminal():
         os.system('clear')
 
 
-def ask_number(message="Give a number: ", lower_limit=0, upper_limit=None, return_type=int, default_number=None, allow_empty=False):
+def ask_number(message="Give a number: ",
+               lower_limit=0,
+               upper_limit=None,
+               return_type=int,
+               default_number=None,
+               allow_empty=False):
     """
     Checks that the user enters a number and not something else
     :param allow_empty: If yes, allows the user to not enter anything. In this case, returns None
@@ -75,19 +81,19 @@ def setup_store():
     return best_buy
 
 
-def list_products(store):
+def print_products(best_buy):
     """
     List products in the store
-    :param store: instance of the class Store
+    :param best_buy: instance of the class Store
     :return: None
     """
-    for product_num, product in enumerate(store.get_all_products()):
+    for product_num, product in enumerate(best_buy.get_all_products()):
         print(f"{product_num+1}. {product.show()}")
 
 
-def show_total_items_in_store(store):
+def show_total_items_in_store(best_buy):
     """ Print total items in the store """
-    total_products_in_store = sum(product.get_quantity() for product in store.get_all_products())
+    total_products_in_store = sum(product.get_quantity() for product in best_buy.get_all_products())
     print(f"Total of {total_products_in_store} items in store")
 
 def print_order(order_list):
@@ -101,18 +107,18 @@ def print_order(order_list):
         product_name, product_price = product.name_and_price(quantity)
         print(f"{order_item_no+1:>5}. {quantity:5} * {product_name:.<30} ${product_price}")
 
-def get_order(store):
+def get_order(best_buy):
     """
     Get a validated order from the user. Ensure the store can provide the order.
-    :param store: instance of the class Store
+    :param best_buy: instance of the class Store
     :return: A list of tuples. The tuple: (instance of Product class, quantity)
     """
     order_list = []
-    available_products = store.get_all_products()
+    available_products = best_buy.get_all_products()
     clear_the_terminal()
     print("   Available products")
     print("   ------------------")
-    list_products(store)
+    print_products(best_buy)
     while True:
         print("\nWhen you want to finish the order, enter empty text.\n")
         product_number = (ask_number(message="Which product # do you want to add to the order? ",
@@ -125,16 +131,16 @@ def get_order(store):
         if product_number is None:
             break
         quantity = (ask_number(message="What amount do you want? ",
-                                     lower_limit=1,
-                                     upper_limit=available_products[product_number - 1].get_quantity(),
-                                     return_type=int,
-                                     allow_empty=True)
+                                lower_limit=1,
+                                upper_limit=available_products[product_number - 1].get_quantity(),
+                                return_type=int,
+                                allow_empty=True)
                         or None
                     )
         if quantity is None:
             break
         order_list.append((available_products[product_number - 1], quantity))
-        validation_result, message = store.validate_shopping_list(order_list)
+        validation_result, message = best_buy.validate_shopping_list(order_list)
         if validation_result is not True:
             order_list.pop()
             print(f"Could not add that to the order because {message}.")
@@ -145,7 +151,7 @@ def get_order(store):
             print_order(order_list)
             print("\n   Available products")
             print("   ------------------")
-            list_products(store)
+            print_products(best_buy)
     return order_list
 
 
@@ -174,7 +180,7 @@ def quit_best_buy():
     Quit the program
     """
     print("Goodbye!")
-    exit()
+    sys.exit()()
 
 
 def start(best_buy):
@@ -184,7 +190,7 @@ def start(best_buy):
     :return: None
     """
     commands = {
-        1: list_products,
+        1: print_products,
         2: show_total_items_in_store,
         3: make_an_order,
     }

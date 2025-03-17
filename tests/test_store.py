@@ -1,12 +1,7 @@
-from statistics import quantiles
-
-import pytest
-
 import products
 from store import Store
 
 class TestStore:
-    #@pytest.fixture(autouse=True)
     def setup(self):
         product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
                         products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
@@ -49,5 +44,12 @@ class TestStore:
         shopping_list = [(product3, 101), (products_all[1], 200)]
         assert (store.validate_shopping_list(shopping_list) ==
                 (False, 'Product Something new is not in the store.'))
+
+    def test_remove_product(self):
+        store = self.setup()
+        products_all = store.get_all_products()
+        store.remove_product(products_all[0])
+        products_all_new = store.get_all_products()
+        assert products_all[1:] == products_all_new
 
 

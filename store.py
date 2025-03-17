@@ -23,13 +23,24 @@ class Store:
         self.list_of_products.append(new_product)
 
     def remove_product(self, product):
+        """
+        Remove a product from the store.
+        :param product: product to remove
+        :return: None
+        """
         if product in self.list_of_products:
             self.list_of_products.remove(product)
 
     def get_total_quantity(self):
+        """
+        Return the total quantity of the product in the store.
+        """
         return sum(product.quantity for product in self.list_of_products)
 
     def get_all_products(self):
+        """
+        Return a list of all products in the store.
+        """
         return [product for product in self.list_of_products if product.is_active()]
 
     def get_product_type_quantity(self):
@@ -39,6 +50,12 @@ class Store:
         return sum(1 for product in self.list_of_products if product.is_active())
 
     def validate_shopping_list(self, shopping_list):
+        """
+        Validate the shopping list which the method "order" can accept.
+        :param shopping_list: A list of tuples. Each tuple == (Product instance, quantity)
+        :return: If valid: True, "No errors"
+                 If not:   False, "Error message"
+        """
         for item in shopping_list:
             if not isinstance(item, tuple):
                 return False, "Shopping list format is wrong."
@@ -61,6 +78,12 @@ class Store:
         return True, "No errors"
 
     def order(self, shopping_list):
+        """
+        Process the shopping list. Reduce quantity of products in the store accordingly.
+        :param shopping_list: A list of tuples. Each tuple == (Product instance, quantity)
+        :return if successful: (float/int, str) price of purchase, "Order completed successfully."
+        :return if not successful: (None, str) None, Error message
+        """
         validation_result, message = self.validate_shopping_list(shopping_list)
         if validation_result is not True:
             return None, message
@@ -68,6 +91,9 @@ class Store:
 
 
 def main():
+    """
+    This was code given in the exercise to test the class.
+    """
     product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
                     products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
                     products.Product("Google Pixel 7", price=500, quantity=250),

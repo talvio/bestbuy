@@ -2,7 +2,6 @@ import pytest
 from products import Product
 
 class TestProduct:
-    #@pytest.fixture(autouse=True)
 
     def test_init(self):
         with pytest.raises(TypeError, match="is invalid"): Product(1, 1, 1)

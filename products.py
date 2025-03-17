@@ -1,5 +1,7 @@
-
 class Product:
+    """
+    Class representing a product.
+    """
 
     def __init__(self, name, price, quantity):
         """
@@ -47,7 +49,7 @@ class Product:
         """
         self.active = False
 
-    def show(self, quantity=None):
+    def show(self):
         """
         Return the product name, price and quantity in a string.
         """
