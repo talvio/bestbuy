@@ -14,7 +14,7 @@ class TestStore:
         store = self.setup()
 
     def test_add_product(self):
-        store = Store()
+        store = Store([])
         product1 = products.Product("MacBook Air M2", price=1450, quantity=100)
         store.add_product(product1)
         assert store.get_all_products()[0] is product1

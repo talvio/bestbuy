@@ -1,7 +1,10 @@
 import products
 
 class Store:
-    def __init__(self, list_of_products = []):
+    """
+    Store functionality. Uses also Product class in store inventory.
+    """
+    def __init__(self, list_of_products = None):
         """
         Initialize the store
         """
@@ -73,7 +76,8 @@ class Store:
             if product not in self.list_of_products:
                 return False, f"Product {product.name} is not in the store."
             if quantity > product.get_quantity():
-                return False, (f"there are {product.get_quantity()} items of {product.name} available. "
+                return False, (f"there are {product.get_quantity()} items of "
+                               f"{product.name} available. "
                                f"The store cannot provide the requested amount: {quantity}")
         return True, "No errors"
 
@@ -87,7 +91,8 @@ class Store:
         validation_result, message = self.validate_shopping_list(shopping_list)
         if validation_result is not True:
             return None, message
-        return sum(product.buy(quantity) for product, quantity in shopping_list), "Order completed successfully."
+        return (sum(product.buy(quantity) for product, quantity in shopping_list),
+                "Order completed successfully.")
 
 
 def main():
