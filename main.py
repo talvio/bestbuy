@@ -30,14 +30,11 @@ def ask_number(message="Give a number: ",
                lower_limit=0,
                upper_limit=None,
                return_type=int,
-               default_number=None,
                allow_empty=False):
     """
     Checks that the user enters a number and not something else
+    :param return_type: int or float
     :param allow_empty: If yes, allows the user to not enter anything. In this case, returns None
-    :param default_number: Return this number if the user gives no other input except hits enter
-                           If default_number is None, empty answer is not allowed.
-                           The default_number needs to be a valid number as well.
     :param upper_limit: The number from the user needs to be below or equal to this
     :param lower_limit: The number from the user needs to be higher or equal to this
     :param message: What we display to xplain to the user what number we need
@@ -46,10 +43,7 @@ def ask_number(message="Give a number: ",
     valid_number = False
     user_input_number = None
     while not valid_number:
-        if default_number is None:
-            user_input_number = input(f"{message}").strip()
-        else:
-            user_input_number = input(f"{message}  [{default_number}] ").strip() or default_number
+        user_input_number = input(f"{message}").strip()
         if len(user_input_number) == 0 and allow_empty:
             return None
         try:
@@ -155,18 +149,18 @@ def get_order(best_buy):
     return order_list
 
 
-def make_an_order(store):
+def make_an_order(best_buy):
     """
     Get an order from the user and then make the order to the store
-    :param store: An instance of the Store class
+    :param best_buy: An instance of the Store class
     :return: None
     """
-    order_list = get_order(store)
+    order_list = get_order(best_buy)
     if len(order_list) == 0 :
         print("Order was empty. Smart move!")
         return
     print("\n********\n")
-    payment_needed, message = store.order(order_list)
+    payment_needed, message = best_buy.order(order_list)
     if payment_needed is None:
         print(f"Error while making an order. The store did not accept the order because {message}")
         return
