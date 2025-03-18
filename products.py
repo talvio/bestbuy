@@ -38,7 +38,15 @@ class ImmaterialProduct:
         """
         self._active = False
 
-    def show(self):
+    def __gt__(self, other):
+        """ Overload > operator. """
+        return self.get_price() > other.get_price()
+
+    def __lt__(self, other):
+        """ Overload < operator. """
+        return self.get_price() < other.get_price()
+
+    def __str__(self):
         """
         Return the product name, price and quantity in a string.
         """
@@ -107,7 +115,7 @@ class Product(ImmaterialProduct):
         """
         self._quantity = quantity
 
-    def show(self):
+    def __str__(self):
         """
         Return the product name, price and quantity in a string.
         """
@@ -146,7 +154,7 @@ class LimitedImmaterialProduct(ImmaterialProduct):
         super().__init__(name, price)
         self.__maximum = maximum
 
-    def show(self):
+    def __str__(self):
         """
         Return the product name, price and quantity in a string.
         """
@@ -172,7 +180,7 @@ class LimitedProduct(Product, LimitedImmaterialProduct):
         super().__init__(name, price, quantity)
         self.__maximum = maximum
 
-    def show(self):
+    def __str__(self):
         """
         Return the product name, price and quantity in a string.
         """

@@ -74,7 +74,8 @@ class Store:
                                "Products are not all inherited from ImmaterialProduct")
         return True, "Shopping list format is correct"
 
-    def merge_shopping_list_items(self, shopping_list):
+    @staticmethod
+    def merge_shopping_list_items(shopping_list):
         """
         If the same product is listed more than once, merge them into one.
         :param shopping_list: A list of tuples. Each tuple == (Product instance, quantity)
@@ -107,7 +108,7 @@ class Store:
                 return False, f"Product {product.name} is not in the store"
             precheck_result, message =  product.precheck_purchase(quantity)
             if precheck_result is False:
-                return (False, message)
+                return False, message
         return True, "No errors"
 
     def order(self, shopping_list):
@@ -123,6 +124,16 @@ class Store:
         return (sum(product.buy(quantity)[0] for product, quantity in shopping_list),
                 "Order completed successfully.")
 
+    def __contains__(self, item):
+        return item in self.list_of_products
+
+    def __add__(self, other):
+        new_store = Store([])
+        for product in self.list_of_products:
+            new_store.add_product(product)
+        for product in other.list_of_products:
+            new_store.add_product(product)
+        return new_store
 
 def main():
     """

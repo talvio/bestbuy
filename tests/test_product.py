@@ -1,5 +1,5 @@
 import pytest
-from products import Product
+from products import Product, LimitedImmaterialProduct
 import promotions
 
 class TestProduct:
@@ -21,11 +21,11 @@ class TestProduct:
 
     def test_init_nominal(self):
         product = Product("Name test testing", price=100, quantity=10000)
-        assert product.show() == "Name test testing, Price: $100, Quantity: 10000, Promotion: None"
+        assert str(product) == "Name test testing, Price: $100, Quantity: 10000, Promotion: None"
 
     def test_show(self):
         product = Product("Name", 1, 2)
-        assert product.show() == "Name, Price: $1, Quantity: 2, Promotion: None"
+        assert str(product) == "Name, Price: $1, Quantity: 2, Promotion: None"
 
     def test_name_and_price(self):
         product = Product("Name", 1, 2)
@@ -66,3 +66,8 @@ class TestProduct:
         product.set_promotion(thirty_percent)
         assert product.buy(100) == (700, 'Purchase was successful')
 
+    def test_price_comparison(self):
+        product1 = Product("Name", 10, 200)
+        product2 = LimitedImmaterialProduct("Name", 12, 200)
+        assert product1 < product2
+        assert not product1 > product2

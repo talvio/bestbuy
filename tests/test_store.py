@@ -84,4 +84,26 @@ class TestStore:
         products_all_new = store.get_all_products()
         assert products_all[1:] == products_all_new
 
+    def test_product_in_store(self):
+        store = self.setup()
+        products_all = store.get_all_products()
+        assert products_all[0] in store
+        product1 = products.Product("MacBook Air M2", price=1500, quantity=100)
+        assert product1 not in store
 
+    def test_adding_stores(self):
+        store1 = self.setup()
+        product_list = [products.Product("Dell 1001", price=1000, quantity=100),
+                        products.Product("Princess Leia Headphones", price=200, quantity=100),
+                        products.Product("Mobile ASD", price=200, quantity=2000),
+                        products.ImmaterialProduct("007 License", price=125000),
+                        products.ImmaterialProduct("Spectre Contract", price=400000),
+                        products.LimitedImmaterialProduct("The Truth", price=100000, maximum=1),
+                        products.LimitedProduct("Fish and Chips", price=10, maximum=1, quantity=100),
+                        ]
+        store2 = Store(product_list)
+        store3 = store1 + store2
+        for product in store1.get_all_products():
+            assert product in store3
+        for product in store2.get_all_products():
+            assert product in store3

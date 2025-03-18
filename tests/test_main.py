@@ -5,10 +5,10 @@ from unittest.mock import patch
 def test_setup_store():
     store = main.setup_store()
     all_products = store.get_all_products()
-    assert (all_products[0].show() ==
+    assert (str(all_products[0]) ==
             ("MacBook Air M2, Price: $1450, Quantity: 100"
              ", Promotion: Second Half price!"))
-    assert (all_products[-1].show() ==
+    assert (str(all_products[-1]) ==
             "Rare coffee, Price: $100, Limited to 1 per order!, Promotion: None")
 
 def test_get_order(monkeypatch, capfd):
@@ -16,11 +16,11 @@ def test_get_order(monkeypatch, capfd):
     inputs_to_get_order = iter(['7', '1', '6', '1', '5', '100', '\n'])
     monkeypatch.setattr('builtins.input', lambda _: next(inputs_to_get_order))
     shopping_list = main.get_order(store)
-    assert (shopping_list[0][0].show() ==
+    assert (str(shopping_list[0][0]) ==
             "Rare coffee, Price: $100, Limited to 1 per order!, Promotion: None")
-    assert (shopping_list[1][0].show() ==
+    assert (str(shopping_list[1][0]) ==
             "Shipping, Price: $10  Limited to 1 per order!, Promotion: None")
-    assert (shopping_list[2][0].show() ==
+    assert (str(shopping_list[2][0]) ==
             "XYZ Service Contract, Price: $400, Quantity: Unlimited, Promotion: None")
     assert shopping_list[0][1] == 1
     assert shopping_list[1][1] == 1

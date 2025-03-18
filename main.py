@@ -97,7 +97,7 @@ def print_products(best_buy):
     :return: None
     """
     for product_num, product in enumerate(best_buy.get_all_products()):
-        print(f"{product_num+1}. {product.show()}")
+        print(f"{product_num+1}. {product}")
 
 
 def show_total_items_in_store(best_buy):
