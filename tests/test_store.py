@@ -34,12 +34,24 @@ class TestStore:
         products_all = store.get_all_products()
         shopping_list = [(products_all[0], 100), (products_all[1], 200)]
         assert store.validate_shopping_list(shopping_list) == (True, 'No errors')
+
+    def test_validate_shopping_list_too_many(self):
+        store = self.setup()
+        products_all = store.get_all_products()
         shopping_list = [(products_all[0], 101), (products_all[1], 200)]
         assert (store.validate_shopping_list(shopping_list) ==
                 (False, ('there are 100 items of MacBook Air M2 available. '
                          'The store cannot provide the requested amount: 101')))
+
+    def test_validate_shopping_list_wrong_format(self):
+        store = self.setup()
+        products_all = store.get_all_products()
         shopping_list = [products_all[0], 100, products_all[1], 200]
         assert store.validate_shopping_list(shopping_list) == (False, 'Shopping list format is wrong.')
+
+    def test_validate_shopping_list_none_existing_product(self):
+        store = self.setup()
+        products_all = store.get_all_products()
         product3 = products.Product("Something new", price=1500, quantity=100)
         shopping_list = [(product3, 101), (products_all[1], 200)]
         assert (store.validate_shopping_list(shopping_list) ==
