@@ -1,5 +1,6 @@
 import pytest
 from products import Product
+import promotions
 
 class TestProduct:
 
@@ -20,11 +21,11 @@ class TestProduct:
 
     def test_init_nominal(self):
         product = Product("Name test testing", price=100, quantity=10000)
-        assert product.show() == "Name test testing, Price: $100, Quantity: 10000"
+        assert product.show() == "Name test testing, Price: $100, Quantity: 10000, Promotion: None"
 
     def test_show(self):
         product = Product("Name", 1, 2)
-        assert product.show() == "Name, Price: $1, Quantity: 2"
+        assert product.show() == "Name, Price: $1, Quantity: 2, Promotion: None"
 
     def test_name_and_price(self):
         product = Product("Name", 1, 2)
@@ -43,3 +44,25 @@ class TestProduct:
         assert product.buy(200) == (200, 'Purchase was successful')
         assert product.is_active() is False
         assert product.get_quantity() == 0
+
+    def test_second_half_price_promotion(self):
+        product = Product("Name", 10, 200)
+        second_half_price = promotions.SecondHalfPrice("Second Half price!")
+        assert product.buy(2) == (20, 'Purchase was successful')
+        product.set_promotion(second_half_price)
+        assert product.buy(2) == (15, 'Purchase was successful')
+
+    def test_third_one_free_promotion(self):
+        product = Product("Name", 10, 200)
+        third_one_free = promotions.ThirdOneFree("Third One Free!")
+        assert product.buy(3) == (30, 'Purchase was successful')
+        product.set_promotion(third_one_free)
+        assert product.buy(3) == (20, 'Purchase was successful')
+
+    def test_thirty_percent_promotion(self):
+        product = Product("Name", 10, 200)
+        thirty_percent = promotions.PercentDiscount("30% off!", percent=30)
+        assert product.buy(100) == (1000, 'Purchase was successful')
+        product.set_promotion(thirty_percent)
+        assert product.buy(100) == (700, 'Purchase was successful')
+

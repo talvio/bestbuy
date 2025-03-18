@@ -2,6 +2,7 @@ import os
 import sys
 import store
 import products
+import promotions
 
 STORE_MENU = """
    Store Menu
@@ -75,6 +76,16 @@ def setup_store():
                      products.LimitedImmaterialProduct("Shipping", price=10, maximum=1),
                      products.LimitedProduct("Rare coffee", price=100, maximum=1, quantity=100),
                    ]
+
+    # Create promotion catalog
+    second_half_price = promotions.SecondHalfPrice("Second Half price!")
+    third_one_free = promotions.ThirdOneFree("Third One Free!")
+    thirty_percent = promotions.PercentDiscount("30% off!", percent=30)
+
+    # Add promotions to products
+    product_list[0].set_promotion(second_half_price)
+    product_list[1].set_promotion(third_one_free)
+    product_list[3].set_promotion(thirty_percent)
     best_buy = store.Store(product_list)
     return best_buy
 
@@ -104,7 +115,7 @@ def print_order(order_list):
     for order_item_no, order_item in enumerate(order_list):
         product, quantity = order_item
         product_name, product_price = product.name_and_price(quantity)
-        print(f"{order_item_no+1:>5}. {quantity:5} * {product_name:.<30} ${product_price}")
+        print(f"{order_item_no+1:>5}. {quantity:5} * {product_name:.<30} ${product_price:8.2f}")
 
 def get_order(best_buy):
     """
@@ -148,6 +159,7 @@ def get_order(best_buy):
             order_list.pop()
             print(f"Could not add that to the order because {message}.")
         else:
+            order_list = best_buy.merge_shopping_list_items(order_list)
             clear_the_terminal()
             print("   Your order so far")
             print("   -----------------")

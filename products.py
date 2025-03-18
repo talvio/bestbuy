@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+import promotions
 
 class ImmaterialProduct:
     """
@@ -18,6 +18,7 @@ class ImmaterialProduct:
         self.name = name
         self._price = price
         self._active = True
+        self._promotion = None
 
     def is_active(self):
         """
@@ -41,12 +42,18 @@ class ImmaterialProduct:
         """
         Return the product name, price and quantity in a string.
         """
-        return f"{self.name}, Price: ${self._price}, Quantity: Unlimited"
+        return f"{self.name}, Price: ${self._price}, Quantity: Unlimited, Promotion: {self._promotion}"
+
+    def get_price(self):
+        """ Get the price of one product"""
+        return self._price
 
     def name_and_price(self, quantity=1):
         """
         Return the product name and price based on given quantity.
         """
+        if self._promotion is not None:
+            return self.name, self._promotion.apply_promotion(self, quantity)
         return self.name, self._price * quantity
 
     def buy(self, quantity=1):
@@ -58,13 +65,19 @@ class ImmaterialProduct:
         precheck, message = self.precheck_purchase(quantity)
         if precheck is False:
             return False, message
+        if self._promotion is not None:
+            return self._promotion.apply_promotion(self, quantity), "Purchase was successful"
         return quantity * self._price, "Purchase was successful"
 
     def precheck_purchase(self, quantity=1):
         if not isinstance(quantity, int) or quantity <= 0:
-            return (False, "impossible quantity given")
-        return (True, "purchase ok") #if self.is_active() else (False, "product not active")
+            return False, "impossible quantity given"
+        return True, "purchase ok" if self.is_active() else (False, "product not active")
 
+    def set_promotion(self, promotion):
+        if not isinstance(promotion, promotions.Promotion):
+            raise TypeError("promotion must be of type promotions.Promotion")
+        self._promotion = promotion
 
 class Product(ImmaterialProduct):
     def __init__(self, name, price, quantity):
@@ -98,7 +111,8 @@ class Product(ImmaterialProduct):
         """
         Return the product name, price and quantity in a string.
         """
-        return f"{self.name}, Price: ${self._price}, Quantity: {self._quantity}"
+        return (f"{self.name}, Price: ${self._price}, "
+               f"Quantity: {self._quantity}, Promotion: {self._promotion}")
 
     def buy(self, quantity=1):
         """
@@ -137,7 +151,8 @@ class LimitedImmaterialProduct(ImmaterialProduct):
         Return the product name, price and quantity in a string.
         """
         return (f"{self.name}, Price: ${self._price} "
-                f" Limited to {self.__maximum} per order!")
+                f" Limited to {self.__maximum} per order!, "
+                f"Promotion: {self._promotion}")
 
     def precheck_purchase(self, quantity=1):
         precheck, message = super().precheck_purchase(quantity)
@@ -161,7 +176,9 @@ class LimitedProduct(Product, LimitedImmaterialProduct):
         """
         Return the product name, price and quantity in a string.
         """
-        return super().show() + f" Limited to {self.__maximum} per order!"
+        return (f"{self.name}, Price: ${self._price}, "
+                f"Limited to {self.__maximum} per order!, " 
+                f"Promotion: {self._promotion}")
 
     def precheck_purchase(self, quantity=1):
         precheck, message = super().precheck_purchase(quantity)
@@ -171,16 +188,6 @@ class LimitedProduct(Product, LimitedImmaterialProduct):
             return (False, f"{self.name} is a limited product. " 
                            f"Only {self.__maximum} allowed in one purchase")
         return precheck, message
-
-
-class Promotion(ABC):
-    def __init__(self, name):
-        self.name = name
-
-    @abstractmethod
-    def apply_promotion(self, product, quantity):
-        pass
-
 
 
 def main():

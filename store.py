@@ -74,6 +74,21 @@ class Store:
                                "Products are not all inherited from ImmaterialProduct")
         return True, "Shopping list format is correct"
 
+    def merge_shopping_list_items(self, shopping_list):
+        """
+        If the same product is listed more than once, merge them into one.
+        :param shopping_list: A list of tuples. Each tuple == (Product instance, quantity)
+        """
+        # If same product is ordered twice inside the same order, combine them
+        unified_shopping_list = {}
+        for product, quantity in shopping_list:
+            if product in unified_shopping_list:
+                unified_shopping_list[product] += quantity
+            else:
+                unified_shopping_list[product] = quantity
+        return [(product, quantity) for product, quantity in unified_shopping_list.items()]
+
+
     def validate_shopping_list(self, shopping_list):
         """
         Validate the shopping list which the method "order" can accept.
@@ -86,13 +101,8 @@ class Store:
             return validation_result, message
 
         # If same product is ordered twice inside the same order, combine them
-        unified_shopping_list = {}
-        for product, quantity in shopping_list:
-            if product in unified_shopping_list:
-                unified_shopping_list[product] += quantity
-            else:
-                unified_shopping_list[product] = quantity
-        for product, quantity in unified_shopping_list.items():
+        unified_shopping_list = self.merge_shopping_list_items(shopping_list)
+        for product, quantity in unified_shopping_list:
             if product not in self.list_of_products:
                 return False, f"Product {product.name} is not in the store"
             precheck_result, message =  product.precheck_purchase(quantity)
