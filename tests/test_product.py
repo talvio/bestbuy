@@ -32,14 +32,14 @@ class TestProduct:
 
     def test_buy_too_many(self):
         product = Product("Name", 1, 200)
-        assert product.buy(100) == 100
+        assert product.buy(100) == (100, 'Purchase was successful')
         assert product.get_quantity() == 100
-        with pytest.raises(ValueError, match="Quantity is greater"):  product.buy(101)
+        assert product.buy(101) == (False, 'there are only 100 pieces of Name. Cannot sell 101')
 
     def test_buy_all(self):
         product = Product("Name", 1, 200)
         assert product.is_active() is True
         assert product.get_quantity() == 200
-        assert product.buy(200) == 200
+        assert product.buy(200) == (200, 'Purchase was successful')
         assert product.is_active() is False
         assert product.get_quantity() == 0

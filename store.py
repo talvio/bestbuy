@@ -20,8 +20,14 @@ class Store:
         :return: None
         """
         for old_product in self.list_of_products:
-            if old_product.name == new_product.name and old_product.price == new_product.price:
-                old_product.quantity += new_product.quantity
+            if (old_product.name_and_price() == new_product.name_and_price()
+                    and isinstance(old_product, products.Product)
+                    and isinstance(new_product, products.Product)):
+                old_product.set_quantity(old_product.get_quantity() + new_product.get_quantity())
+                return
+            if (old_product.name_and_price() == new_product.name_and_price()
+                    and isinstance(old_product, products.ImmaterialProduct)
+                    and isinstance(new_product, products.ImmaterialProduct)):
                 return
         self.list_of_products.append(new_product)
 
@@ -52,6 +58,22 @@ class Store:
         """
         return sum(1 for product in self.list_of_products if product.is_active())
 
+    @staticmethod
+    def validate_shopping_list_format(shopping_list):
+        for item in shopping_list:
+            if not isinstance(item, tuple):
+                return (False, "Shopping list format is wrong. "
+                               "List items are not all tuples")
+            if len(item) != 2:
+                return (False, "Shopping list format is wrong. "
+                               "List items are not all tuples  of length 2")
+            product, quantity = item
+            if not isinstance(product, products.ImmaterialProduct) or not isinstance(quantity, int):
+                print(product)
+                return (False, "Shopping list format is wrong. "
+                               "Products are not all inherited from ImmaterialProduct")
+        return True, "Shopping list format is correct"
+
     def validate_shopping_list(self, shopping_list):
         """
         Validate the shopping list which the method "order" can accept.
@@ -59,26 +81,23 @@ class Store:
         :return: If valid: True, "No errors"
                  If not:   False, "Error message"
         """
-        for item in shopping_list:
-            if not isinstance(item, tuple):
-                return False, "Shopping list format is wrong."
-            if len(item) != 2:
-                return False, "Shopping list format is wrong."
+        validation_result, message = self.validate_shopping_list_format(shopping_list)
+        if validation_result is False:
+            return validation_result, message
+
+        # If same product is ordered twice inside the same order, combine them
         unified_shopping_list = {}
         for product, quantity in shopping_list:
-            if not isinstance(product, products.Product) or not isinstance(quantity, int):
-                return False, "Shopping list format is wrong."
             if product in unified_shopping_list:
                 unified_shopping_list[product] += quantity
             else:
                 unified_shopping_list[product] = quantity
         for product, quantity in unified_shopping_list.items():
             if product not in self.list_of_products:
-                return False, f"Product {product.name} is not in the store."
-            if quantity > product.get_quantity():
-                return False, (f"there are {product.get_quantity()} items of "
-                               f"{product.name} available. "
-                               f"The store cannot provide the requested amount: {quantity}")
+                return False, f"Product {product.name} is not in the store"
+            precheck_result, message =  product.precheck_purchase(quantity)
+            if precheck_result is False:
+                return (False, message)
         return True, "No errors"
 
     def order(self, shopping_list):
@@ -91,7 +110,7 @@ class Store:
         validation_result, message = self.validate_shopping_list(shopping_list)
         if validation_result is not True:
             return None, message
-        return (sum(product.buy(quantity) for product, quantity in shopping_list),
+        return (sum(product.buy(quantity)[0] for product, quantity in shopping_list),
                 "Order completed successfully.")
 
 

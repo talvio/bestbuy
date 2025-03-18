@@ -69,7 +69,11 @@ def setup_store():
     """setup initial stock of inventory"""
     product_list = [ products.Product("MacBook Air M2", price=1450, quantity=100),
                      products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-                     products.Product("Google Pixel 7", price=500, quantity=250)
+                     products.Product("Google Pixel 7", price=500, quantity=250),
+                     products.ImmaterialProduct("Windows License", price=125),
+                     products.ImmaterialProduct("XYZ Service Contract", price=400),
+                     products.LimitedImmaterialProduct("Shipping", price=10, maximum=1),
+                     products.LimitedProduct("Rare coffee", price=100, maximum=1, quantity=100),
                    ]
     best_buy = store.Store(product_list)
     return best_buy
@@ -87,7 +91,8 @@ def print_products(best_buy):
 
 def show_total_items_in_store(best_buy):
     """ Print total items in the store """
-    total_products_in_store = sum(product.get_quantity() for product in best_buy.get_all_products())
+    total_products_in_store = sum(product.get_quantity() for product in best_buy.get_all_products()
+                                  if isinstance(product, products.Product))
     print(f"Total of {total_products_in_store} items in store")
 
 def print_order(order_list):
@@ -124,9 +129,13 @@ def get_order(best_buy):
             )
         if product_number is None:
             break
+        if isinstance(available_products[product_number - 1], products.ImmaterialProduct):
+            upper_limit = None
+        else:
+            upper_limit = available_products[product_number - 1].get_quantity()
         quantity = (ask_number(message="What amount do you want? ",
                                 lower_limit=1,
-                                upper_limit=available_products[product_number - 1].get_quantity(),
+                                upper_limit=upper_limit,
                                 return_type=int,
                                 allow_empty=True)
                         or None
@@ -173,7 +182,7 @@ def quit_best_buy():
     """
     Quit the program
     """
-    print("Goodbye!")
+    print("      Goodbye!\n\n")
     sys.exit()()
 
 
