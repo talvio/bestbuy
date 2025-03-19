@@ -1,8 +1,15 @@
+"""
+Various product classes for the Store class to use.
+"""
+
 import promotions
+
 
 class ImmaterialProduct:
     """
-    Class representing a product.
+    Class representing a product. Since the product is immaterial, there
+    is a limitless supply.
+    This is the base class for all product classes.
     """
 
     def __init__(self, name, price):
@@ -50,7 +57,8 @@ class ImmaterialProduct:
         """
         Return the product name, price and quantity in a string.
         """
-        return f"{self.name}, Price: ${self._price}, Quantity: Unlimited, Promotion: {self._promotion}"
+        return f"{self.name}, Price: ${self._price}, "\
+               f"Quantity: Unlimited, Promotion: {self._promotion}"
 
     def get_price(self):
         """ Get the price of one product"""
@@ -78,16 +86,31 @@ class ImmaterialProduct:
         return quantity * self._price, "Purchase was successful"
 
     def precheck_purchase(self, quantity=1):
+        """
+        Check if it is possible to purchase the product in the quantity defined.
+        :param quantity: How many products are being purchased.
+        :return: Tuple (True/False, message) Message explain why the product cannot be purchased.
+        """
         if not isinstance(quantity, int) or quantity <= 0:
             return False, "impossible quantity given"
         return True, "purchase ok" if self.is_active() else (False, "product not active")
 
     def set_promotion(self, promotion):
+        """
+        Attach a promotion to the product.
+        :param promotion: Promotion object.
+        :return: None
+        """
         if not isinstance(promotion, promotions.Promotion):
             raise TypeError("promotion must be of type promotions.Promotion")
         self._promotion = promotion
 
 class Product(ImmaterialProduct):
+    """
+    Class representing a product.
+    The major difference from ImmaterialProduct:
+    There is a defined number of the product available.
+    """
     def __init__(self, name, price, quantity):
         """
         Initialize the product.
@@ -101,7 +124,7 @@ class Product(ImmaterialProduct):
         if quantity < 0:
             raise ValueError("One of the arguments to Product is invalid")
         self._quantity = quantity
-        self._active = True if quantity > 0 else False
+        self._active = quantity > 0
 
     def get_quantity(self):
         """
@@ -137,20 +160,31 @@ class Product(ImmaterialProduct):
         return purchase_result, message
 
     def precheck_purchase(self, quantity=1):
+        """
+        Check if it is possible to purchase the product in the quantity defined.
+        :param quantity: How many products are being purchased.
+        :return: Tuple (True/False, message) Message explain why the product cannot be purchased.
+        """
         precheck, message = super().precheck_purchase(quantity)
         if precheck is False:
             return False, message
         if quantity > self._quantity:
-            return (False, f"there are only {self._quantity} pieces of {self.name}. " 
+            return (False, f"there are only {self._quantity} pieces of {self.name}. "
                            f"Cannot sell {quantity}")
         return precheck, message
 
 
 class LimitedImmaterialProduct(ImmaterialProduct):
     """
-    Limited immaterial product can be sold only one at a time
+    Limited immaterial product can be sold only a defined amount in one order.
     """
     def __init__(self, name, price, maximum=1):
+        """
+        Initialize the product.
+        :param name: Name of the product.
+        :param price: Price of the product.
+        :param maximum: How many of the product can be included in one order.
+        """
         super().__init__(name, price)
         self.__maximum = maximum
 
@@ -163,11 +197,16 @@ class LimitedImmaterialProduct(ImmaterialProduct):
                 f"Promotion: {self._promotion}")
 
     def precheck_purchase(self, quantity=1):
+        """
+        Check if it is possible to purchase the product in the quantity defined.
+        :param quantity: How many products are being purchased.
+        :return: Tuple (True/False, message) Message explain why the product cannot be purchased.
+        """
         precheck, message = super().precheck_purchase(quantity)
         if precheck is False:
             return False, message
         if quantity > self.__maximum:
-            return (False, f"{self.name} is a limited product. " 
+            return (False, f"{self.name} is a limited product. "
                            f"Only {self.__maximum} allowed in one purchase")
         return precheck, message
 
@@ -185,15 +224,20 @@ class LimitedProduct(Product, LimitedImmaterialProduct):
         Return the product name, price and quantity in a string.
         """
         return (f"{self.name}, Price: ${self._price}, "
-                f"Limited to {self.__maximum} per order!, " 
+                f"Limited to {self.__maximum} per order!, "
                 f"Promotion: {self._promotion}")
 
     def precheck_purchase(self, quantity=1):
+        """
+        Check if it is possible to purchase the product in the quantity defined.
+        :param quantity: How many products are being purchased.
+        :return: Tuple (True/False, message) Message explain why the product cannot be purchased.
+        """
         precheck, message = super().precheck_purchase(quantity)
         if precheck is False:
             return False, message
         if quantity > self.__maximum:
-            return (False, f"{self.name} is a limited product. " 
+            return (False, f"{self.name} is a limited product. "
                            f"Only {self.__maximum} allowed in one purchase")
         return precheck, message
 
@@ -203,15 +247,6 @@ def main():
     Test the Product class
     :return:
     """
-    product_list = [Product("MacBook Air M2", price=1450, quantity=100),
-                    Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-                    Product("Google Pixel 7", price=500, quantity=250),
-                    ImmaterialProduct("Windows License", price=125),
-                    ImmaterialProduct("XYZ Service Contract", price=400),
-                    LimitedImmaterialProduct("Shipping", price=10, maximum=1),
-                    LimitedProduct("Rare coffee", price=100, maximum=1, quantity=100),
-                    ]
-
     bose = Product("Bose QuietComfort Earbuds", price=250, quantity=500)
     mac = Product("MacBook Air M2", price=1450, quantity=100)
     service = ImmaterialProduct("Service", price=1000)
@@ -221,8 +256,8 @@ def main():
     print(mac.buy(100))
     print(mac.is_active())
 
-    print(bose.show())
-    print(mac.show())
+    print(bose)
+    print(mac)
 
 
 if __name__ == "__main__":

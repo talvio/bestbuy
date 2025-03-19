@@ -1,3 +1,6 @@
+"""
+The main part of Best Buy application
+"""
 import os
 import sys
 import store
@@ -13,6 +16,7 @@ STORE_MENU = """
 4. Quit
 
 Please choose a number: """
+
 
 def clear_the_terminal():
     """
@@ -106,6 +110,7 @@ def show_total_items_in_store(best_buy):
                                   if isinstance(product, products.Product))
     print(f"Total of {total_products_in_store} items in store")
 
+
 def print_order(order_list):
     """
     Print the quantity, products, and total price of each order item in the order list
@@ -116,6 +121,7 @@ def print_order(order_list):
         product, quantity = order_item
         product_name, product_price = product.name_and_price(quantity)
         print(f"{order_item_no+1:>5}. {quantity:5} * {product_name:.<30} ${product_price:8.2f}")
+
 
 def get_order(best_buy):
     """
@@ -187,7 +193,7 @@ def make_an_order(best_buy):
         return
     print("Order made!\n")
     print_order(order_list)
-    print(f"\nTotal payment: ${payment_needed}")
+    print(f"\nTotal payment: ${payment_needed:.2f}")
 
 
 def quit_best_buy():

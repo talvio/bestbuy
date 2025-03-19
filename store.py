@@ -1,4 +1,9 @@
+"""
+The Store class to be used in Best Buy application.
+"""
+
 import products
+
 
 class Store:
     """
@@ -60,6 +65,13 @@ class Store:
 
     @staticmethod
     def validate_shopping_list_format(shopping_list):
+        """
+        Validate the shopping list format. Other checks are also needed
+        and they are done elsewhere.
+        :param shopping_list: The shopping list. A list of tuples (product, quantity).
+        :return: A tuple: (True/False, message string) where message is why the
+                 shopping list is invalid or ok if format is fine.
+        """
         for item in shopping_list:
             if not isinstance(item, tuple):
                 return (False, "Shopping list format is wrong. "
@@ -87,7 +99,7 @@ class Store:
                 unified_shopping_list[product] += quantity
             else:
                 unified_shopping_list[product] = quantity
-        return [(product, quantity) for product, quantity in unified_shopping_list.items()]
+        return list(unified_shopping_list.items())
 
 
     def validate_shopping_list(self, shopping_list):
