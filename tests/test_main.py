@@ -9,7 +9,7 @@ def test_setup_store():
             ("MacBook Air M2, Price: $1450, Quantity: 100"
              ", Promotion: Second Half price!"))
     assert (str(all_products[-1]) ==
-            "Rare coffee, Price: $100, Limited to 1 per order!, Promotion: None")
+            "Rare coffee, Price: $100, Quantity: 100, Limited to 1 per order!, Promotion: None")
 
 def test_get_order(monkeypatch, capfd):
     store = main.setup_store()
@@ -17,7 +17,7 @@ def test_get_order(monkeypatch, capfd):
     monkeypatch.setattr('builtins.input', lambda _: next(inputs_to_get_order))
     shopping_list = main.get_order(store)
     assert (str(shopping_list[0][0]) ==
-            "Rare coffee, Price: $100, Limited to 1 per order!, Promotion: None")
+            "Rare coffee, Price: $100, Quantity: 100, Limited to 1 per order!, Promotion: None")
     assert (str(shopping_list[1][0]) ==
             "Shipping, Price: $10  Limited to 1 per order!, Promotion: None")
     assert (str(shopping_list[2][0]) ==

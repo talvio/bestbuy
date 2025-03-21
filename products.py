@@ -137,6 +137,7 @@ class Product(ImmaterialProduct):
         Set the quantity of the product.
         """
         self._quantity = quantity
+        self._active = quantity > 0
 
     def __str__(self):
         """
@@ -154,9 +155,7 @@ class Product(ImmaterialProduct):
         purchase_result, message = super().buy(quantity)
         if purchase_result is False:
             return False, message
-        self._quantity -= quantity
-        if self._quantity == 0:
-            self.deactivate()
+        self.set_quantity(self.get_quantity() - quantity)
         return purchase_result, message
 
     def precheck_purchase(self, quantity=1):
@@ -224,6 +223,7 @@ class LimitedProduct(Product, LimitedImmaterialProduct):
         Return the product name, price and quantity in a string.
         """
         return (f"{self.name}, Price: ${self._price}, "
+                f"Quantity: {self._quantity}, "
                 f"Limited to {self.__maximum} per order!, "
                 f"Promotion: {self._promotion}")
 
